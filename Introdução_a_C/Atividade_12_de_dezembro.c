@@ -3,6 +3,11 @@
     Curso: Sistemas de Informação - primeiro período
     Aluno: Saulo Ferro Maciel
     Atividade do dia 12 de Dezembro - Teste prático
+
+    1) A turma de Fundamentos de Programação tem apenas 5 alunos. 
+    Cada um deles recebeu uma nota pelo seu trabalho final da disciplina. 
+    Faça um algoritmo que leia as notas dos 5 alunos desta turma e mostre a maior nota, 
+    a menor nota e a média aritmética da turma.
 */
 
 #include <stdio.h>
