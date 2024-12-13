@@ -14,24 +14,36 @@ int main() {
     setlocale(LC_ALL, "Portuguese");
 
     // Variavéis Globais
-    int i, idadeMae, idade, idadeFilhoMeio, idadeFilhoNovo, idadeFilhoVelho;
+    int i, idadeMae, idade, idadeFilhoMeio = 0, idadeFilhoNovo = 0, idadeFilhoVelho = 0;
     float aresta, arestaA, arestaB, arestaC, arestaD;
 
     /* 1º) Descubra a idade do filho mais velho:*/
-    for (i=1;i <= 3; i++){
-        if (i==1){
-            printf("Descobrindo as idades\n\nDigite a idade da mãe:\n");scanf("%d",&idadeMae);
-        }
-        printf("Digite a idade do %dº filho (a):\n",i);scanf("%d",&idade);
-        if(idade < idadeMae){
-            idadeFilhoMeio = idade;
-        } 
-        if (idadeFilhoMeio > idade < idadeMae){
-            idadeFilhoNovo = idade;
+    printf("Descobrindo as idades\n\nDigite a idade da mãe:\n");
+    scanf("%d", &idadeMae);
+
+    // Lê as idades dos filhos
+    for (int i = 1; i <= 2; i++) {
+        printf("Digite a idade do %dº filho (a):\n", i);
+        scanf("%d", &idade);
+
+        if (i == 1) {
+            idadeFilhoMeio = idade;  
+        } else {
+            if (idade < idadeFilhoMeio) {
+                idadeFilhoNovo = idade;  
+            } else {
+                idadeFilhoVelho = idade;  // 
+            }
         }
     }
-    idadeFilhoVelho = idadeMae-(idadeFilhoMeio+idadeFilhoNovo);
-    printf("A mãe possuí %d anos,\no filho mais velho possuí %d anos,\no filho do meio possuí %d anos,\no filho caçula tem %danos",idadeMae,idadeFilhoVelho,idadeFilhoMeio,idadeFilhoNovo);
+
+    // Cálculo da idade do filho mais velho
+    if (idadeFilhoVelho == 0) {
+        idadeFilhoVelho = idadeMae - (idadeFilhoMeio + idadeFilhoNovo);  // Calcula a idade do filho mais velho
+    }
+
+    // Exibe os resultados
+    printf("A mãe possui %d anos,\no filho mais velho possui %d anos,\no filho do meio possui %d anos,\no filho caçula tem %d anos\n", idadeMae, idadeFilhoVelho, idadeFilhoMeio, idadeFilhoNovo);
 
 
     /* 2º) Formando triângulos: */
