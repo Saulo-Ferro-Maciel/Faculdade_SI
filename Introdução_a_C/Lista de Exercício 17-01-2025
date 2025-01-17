@@ -1,0 +1,123 @@
+/*
+    IFMA - Monte Castelo
+    Curso: Sistemas de Informação - primeiro período
+    Aluno: Saulo Ferro Maciel
+    Atividade do dia 17 de janeiro de 2025 - Lista de Exercício
+
+    1.Dado um vetor v = [10, 20, 30, 40, 50], mostre na tela o conteúdo do vetor v em
+    sequência.
+    2.Dada uma sequência de n números, imprimi-la na ordem inversa à da leitura.
+    3.Leia um vetor de 10 posições. Contar e escrever quantos valores pares ele possui.
+    4.Faça um programa que leia um vetor de 10 posições e verifique se existem valores
+    iguais e os escreva na tela.
+    5.Implemente ou crie um programa em C que receba do usuário dez temperaturas em
+    graus Farenheit, transforme-as em graus Celsius e armazene os resultados em um
+    vetor. Terminada a entrada de dados, os valores armazenados devem ser
+    apresentados.
+        Obs.: A fórmula é C = 5/9 (F – 32).
+    6.Leia um vetor de 10 posições e atribua valor 0 para todos os elementos que
+    possuírem valores negativos.
+    Conteúdo: Matrizes
+    7.Leia uma matriz 4 x 4, conte e escreva quantos valores maiores que 10 ela possui.
+    8.Leia uma matriz 5 x 3, imprima a matriz e retorne a localização (linha e a coluna) do
+    maior valor.
+    9.Leia uma matriz de 3 x 3 elementos. Calcule a soma dos elementos que estão na
+    diagonal principal.
+    10.Leia uma matriz 10 x 3 com as notas de 10 alunos em 3 provas. Em seguida,
+    escreva o número de alunos cuja pior nota foi na prova 1, o número de alunos cuja
+    pior nota foi na prova 2, e o número de alunos cuja pior nota foi na prova 3. Em
+    caso de empate das piores notas de um aluno, o critério de desempate é arbitrário,
+    mas o aluno deve ser contabilizado apenas uma vez.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+
+void quarta_questao() {
+    int resposta, cont, resposta2, posicao, posicao2;
+
+    printf("Quantos elementos o vetor terá?\nResposta= ");
+    scanf("%d", &resposta);
+
+    int v[resposta];
+
+    // Preenchendo o vetor com os elementos fornecidos pelo usuário
+    for(cont = 0; cont < resposta; cont++) {
+        printf("Adicione o %dº elemento:\nResposta= ", cont + 1);
+        scanf("%d", &resposta2);
+        v[cont] = resposta2;
+    }
+
+    // Comparando os elementos consecutivos
+    for(cont = 0; cont < resposta - 1; cont++) {
+        posicao = v[cont];
+        posicao2 = v[cont + 1];
+
+        if(posicao == posicao2) {
+            printf("O número %d e o %d são iguais\n", posicao, posicao2);
+        }
+    }
+
+    return 0;
+}
+
+void terceira_questao() {
+    int cont, resposta2;
+    int v[10];
+
+    // Preenchendo o vetor com 10 números
+    for(cont = 0; cont < 10; cont++) {
+        printf("Adicione o %dº elemento:\nResposta= ", cont + 1);
+        scanf("%d", &resposta2);
+        v[cont] = resposta2;  // Armazena o número no vetor
+    }
+
+    // Imprimindo os valores armazenados no vetor
+    printf("Os elementos digitados foram:\n");
+    for(cont = 0; cont < 10; cont++) {
+        printf("%d\n", v[cont]);  // Imprime o valor armazenado no índice cont
+    }
+}
+void segunda_questao() {
+    int resposta,cont,resposta2,e;
+
+    printf("Quantos elemento o vetor terá?\nResposta= ");scanf("%d",&resposta);
+    int v[resposta];
+
+    for(cont=0; cont <= (resposta - 1); cont++) {
+        printf("Adicione o %d elemento?\nResposta= ",cont+1);scanf("%d",&resposta2);
+        v[cont]=resposta2;
+    }
+    for(cont=resposta-1; cont >= 0; cont--) {
+        e=v[cont];
+        printf("%d\n",e);
+    }
+    return 0;
+}
+
+void primeira_questao(){
+    int v[]={10, 20, 30, 40, 50},cont, e;
+    for(cont=0; cont <= 5 - 1; cont++) {
+        e=v[cont];
+        printf("%d\n",e);
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "Portuguese");
+
+    printf("\nPrimeira Questão e sua Resolução:\n");
+    primeira_questao();
+
+    printf("\n\nSegunda Questão e sua Resolução:\n");
+    segunda_questao();
+
+    printf("\n\nTerceira Questão e sua Resolução:\n");
+    terceira_questao();
+
+    printf("\n\nQuarta Questão e sua Resolução:\n");
+    quarta_questao();
+
+    return 0;
+}
