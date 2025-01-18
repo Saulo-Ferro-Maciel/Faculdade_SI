@@ -34,7 +34,30 @@
 #include <stdlib.h>
 #include <locale.h>
 
+void quinta_questao(){
+    printf("\033[H\033[J");
+
+    int resposta, cont;
+    printf("Quantas temperaturas a serem convertidas de Cº para Fº?\nRespostas= ");scanf("%d",&resposta);
+    
+    float f[resposta], temp, celsius;
+    for(cont=0;cont <= (resposta-1); cont++){
+        printf("Digite a %dª temperatura Fº: ",cont+1);scanf("%f",&temp);
+        f[cont]=temp;
+    }
+    
+    for(cont=0;cont <= (resposta-1); cont++){
+        celsius = f[cont];
+        celsius = (celsius-32)*5/9;
+        printf("A temperatura de %.2fCº é igual a %.2fFº.\n",f[cont],celsius);
+    }
+
+    return 0;
+}
+
 void quarta_questao() {
+    printf("\033[H\033[J");
+
     int resposta, cont, resposta2, posicao, posicao2;
 
     printf("Quantos elementos o vetor terá?\nResposta= ");
@@ -63,6 +86,8 @@ void quarta_questao() {
 }
 
 void terceira_questao() {
+    printf("\033[H\033[J");
+
     int cont, resposta2;
     int v[10];
 
@@ -80,6 +105,8 @@ void terceira_questao() {
     }
 }
 void segunda_questao() {
+    printf("\033[H\033[J");
+
     int resposta,cont,resposta2,e;
 
     printf("Quantos elemento o vetor terá?\nResposta= ");scanf("%d",&resposta);
