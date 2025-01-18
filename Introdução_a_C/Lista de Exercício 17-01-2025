@@ -4,147 +4,137 @@
     Aluno: Saulo Ferro Maciel
     Atividade do dia 17 de janeiro de 2025 - Lista de Exercício
 
-    1.Dado um vetor v = [10, 20, 30, 40, 50], mostre na tela o conteúdo do vetor v em
-    sequência.
-    2.Dada uma sequência de n números, imprimi-la na ordem inversa à da leitura.
-    3.Leia um vetor de 10 posições. Contar e escrever quantos valores pares ele possui.
-    4.Faça um programa que leia um vetor de 10 posições e verifique se existem valores
-    iguais e os escreva na tela.
-    5.Implemente ou crie um programa em C que receba do usuário dez temperaturas em
-    graus Farenheit, transforme-as em graus Celsius e armazene os resultados em um
-    vetor. Terminada a entrada de dados, os valores armazenados devem ser
-    apresentados.
-        Obs.: A fórmula é C = 5/9 (F – 32).
-    6.Leia um vetor de 10 posições e atribua valor 0 para todos os elementos que
-    possuírem valores negativos.
-    Conteúdo: Matrizes
-    7.Leia uma matriz 4 x 4, conte e escreva quantos valores maiores que 10 ela possui.
-    8.Leia uma matriz 5 x 3, imprima a matriz e retorne a localização (linha e a coluna) do
-    maior valor.
-    9.Leia uma matriz de 3 x 3 elementos. Calcule a soma dos elementos que estão na
-    diagonal principal.
-    10.Leia uma matriz 10 x 3 com as notas de 10 alunos em 3 provas. Em seguida,
-    escreva o número de alunos cuja pior nota foi na prova 1, o número de alunos cuja
-    pior nota foi na prova 2, e o número de alunos cuja pior nota foi na prova 3. Em
-    caso de empate das piores notas de um aluno, o critério de desempate é arbitrário,
-    mas o aluno deve ser contabilizado apenas uma vez.
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <unistd.h>
 
-void quinta_questao(){
-    printf("\033[H\033[J");
+void terminalClear(int clock) {
+    sleep(clock+1.5); // Apenas aguarda o tempo que o usuário deseja antes de limpar
+    printf("\033[H\033[J");  // Limpa o terminal
+}
 
+void quinta_questao() {
     int resposta, cont;
-    printf("Quantas temperaturas a serem convertidas de Cº para Fº?\nRespostas= ");scanf("%d",&resposta);
+    printf("Quantas temperaturas a serem convertidas de Cº para Fº?\nRespostas= "); 
+    scanf("%d", &resposta);
     
     float f[resposta], temp, celsius;
-    for(cont=0;cont <= (resposta-1); cont++){
-        printf("Digite a %dª temperatura Fº: ",cont+1);scanf("%f",&temp);
-        f[cont]=temp;
+    for(cont = 0; cont <= (resposta-1); cont++) {
+        printf("Digite a %dª temperatura Cº: ", cont + 1);
+        scanf("%f", &temp);
+        f[cont] = temp;
     }
     
-    for(cont=0;cont <= (resposta-1); cont++){
+    for(cont = 0; cont <= (resposta-1); cont++) {
         celsius = f[cont];
-        celsius = (celsius-32)*5/9;
-        printf("A temperatura de %.2fCº é igual a %.2fFº.\n",f[cont],celsius);
+        celsius = (celsius - 32) * 5 / 9;
+        printf("A temperatura de %.2fCº é igual a %.2fFº.\n", f[cont], celsius);
     }
-
-    return 0;
 }
 
 void quarta_questao() {
-    printf("\033[H\033[J");
-
-    int resposta, cont, resposta2, posicao, posicao2;
-
+    int resposta, cont, resposta2;
     printf("Quantos elementos o vetor terá?\nResposta= ");
     scanf("%d", &resposta);
-
     int v[resposta];
 
-    // Preenchendo o vetor com os elementos fornecidos pelo usuário
-    for(cont = 0; cont < resposta; cont++) {
+    for(cont = 0; cont <= (resposta-1); cont++) {
         printf("Adicione o %dº elemento:\nResposta= ", cont + 1);
         scanf("%d", &resposta2);
         v[cont] = resposta2;
     }
 
-    // Comparando os elementos consecutivos
-    for(cont = 0; cont < resposta - 1; cont++) {
-        posicao = v[cont];
-        posicao2 = v[cont + 1];
-
-        if(posicao == posicao2) {
-            printf("O número %d e o %d são iguais\n", posicao, posicao2);
+    int encontrou_iguais = 0;
+    for(cont = 0; cont <= (resposta-1); cont++) {
+        for(int j = cont + 1; j <= (resposta-1); j++) {
+            if(v[cont] == v[j]) {
+                printf("O número %d (na posição %d) e %d (na posição %d) são iguais.\n", v[cont], cont + 1, v[j], j + 1);
+                encontrou_iguais = 1;
+            }
         }
     }
 
-    return 0;
+    if(!encontrou_iguais) {
+        printf("Não há elementos iguais no vetor.\n");
+    }
 }
 
 void terceira_questao() {
-    printf("\033[H\033[J");
-
-    int cont, resposta2;
+    int cont, resposta2, resto;
     int v[10];
 
-    // Preenchendo o vetor com 10 números
     for(cont = 0; cont < 10; cont++) {
         printf("Adicione o %dº elemento:\nResposta= ", cont + 1);
         scanf("%d", &resposta2);
-        v[cont] = resposta2;  // Armazena o número no vetor
+        v[cont] = resposta2; 
     }
 
-    // Imprimindo os valores armazenados no vetor
     printf("Os elementos digitados foram:\n");
     for(cont = 0; cont < 10; cont++) {
-        printf("%d\n", v[cont]);  // Imprime o valor armazenado no índice cont
+        printf("%d ", v[cont]); 
     }
+    printf("\nOs elementos PARES digitados foram:\n");
+    for(cont = 0; cont < 10; cont++) {
+        if(v[cont]%2==0){
+            printf("%d ", v[cont]);
+        }
+    }
+    printf("\n");
 }
+
 void segunda_questao() {
-    printf("\033[H\033[J");
+    int resposta, cont, resposta2, e;
 
-    int resposta,cont,resposta2,e;
-
-    printf("Quantos elemento o vetor terá?\nResposta= ");scanf("%d",&resposta);
+    printf("Quantos elementos o vetor terá?\nResposta= ");
+    scanf("%d", &resposta);
     int v[resposta];
 
-    for(cont=0; cont <= (resposta - 1); cont++) {
-        printf("Adicione o %d elemento?\nResposta= ",cont+1);scanf("%d",&resposta2);
-        v[cont]=resposta2;
+    for(cont = 0; cont <= (resposta-1); cont++) {
+        printf("Adicione o %dº elemento?\nResposta= ", cont + 1);
+        scanf("%d", &resposta2);
+        v[cont] = resposta2;
     }
-    for(cont=resposta-1; cont >= 0; cont--) {
-        e=v[cont];
-        printf("%d\n",e);
+
+    for(cont = (resposta - 1); cont >= 0; cont--) {
+        e = v[cont];
+        printf("%d\n", e);
     }
-    return 0;
 }
 
-void primeira_questao(){
-    int v[]={10, 20, 30, 40, 50},cont, e;
-    for(cont=0; cont <= 5 - 1; cont++) {
-        e=v[cont];
-        printf("%d\n",e);
+void primeira_questao() {
+    int v[5] = {10, 20, 30, 40, 50}, cont, e;
+    printf("\nO vetor possuí esses valores:\n");
+    for(cont = 0; cont < 5; cont++) {
+        e = v[cont];
+        printf("%d\n", e);
     }
 }
 
 int main() {
     setlocale(LC_ALL, "Portuguese");
 
-    printf("\nPrimeira Questão e sua Resolução:\n");
+    printf("Primeira Questão e sua Resolução:\n");
     primeira_questao();
+    terminalClear(5); 
 
-    printf("\n\nSegunda Questão e sua Resolução:\n");
+    printf("\nSegunda Questão e sua Resolução:\n");
     segunda_questao();
+    terminalClear(5);
 
-    printf("\n\nTerceira Questão e sua Resolução:\n");
+    printf("\nTerceira Questão e sua Resolução:\n");
     terceira_questao();
+    terminalClear(5);
 
-    printf("\n\nQuarta Questão e sua Resolução:\n");
+    printf("\nQuarta Questão e sua Resolução:\n");
     quarta_questao();
+    terminalClear(5);
+
+    printf("\nQuinta Questão e sua Resolução:\n");
+    quinta_questao();
+    terminalClear(5);
 
     return 0;
 }
