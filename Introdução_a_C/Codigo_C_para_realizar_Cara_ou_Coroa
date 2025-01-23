@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main() {
+    // Variáveis globais
+    int n = 0, cara = 0, coroa = 0;
+
+    srand(time(NULL)); // Inicializa a semente para gerar números aleatórios
+
+    printf("XXXXXXXX Sorteio de Cara ou Coroa XXXXXXXX\n");
+    printf("Quantos lançamentos? ");
+    scanf("%d", &n);
+
+    // Banco de dados dinâmico para armazenar de forma simples
+    float bd[n][3]; // [Lançamento, Total de Caras, Frequência Relativa]
+
+    for (int i = 0; i <= (n-1); i++) {
+        int random_number = rand() % 2; // Gera 0 ou 1
+
+        if (random_number == 1) {
+            cara++;
+        } else {
+            coroa++;
+        }
+
+        // Armazenando os dados
+        bd[i][0] = i + 1;             // Número do lançamento
+        bd[i][1] = cara;              // Total de caras até agora
+        bd[i][2] = (float)cara / (i + 1); // Frequência relativa de caras
+    }
+
+    // Exibindo os resultados
+    printf("\nResultados:\n");
+    printf("Foram %d coroas e %d caras.\n", coroa, cara);
+    printf("Lançamento\tTotal de Caras\tFrequência Relativa\n");
+    for (int i = 0; i <= (n-1); i++) {
+        printf("%d\t\t\t%.0f\t\t\t\t%.2f\n", (int)bd[i][0], bd[i][1], bd[i][2]);
+    }
+
+    return 0;
+}
