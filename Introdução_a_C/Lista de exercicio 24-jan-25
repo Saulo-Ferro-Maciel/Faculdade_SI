@@ -93,7 +93,7 @@ void segundaQuestao(){
     terminalClear(6);
 }
 
-void primeiraQuestão() {
+void primeiraQuestao() {
     float bd[2];
     printf("Analisador de número maior e menor:\n");
     for(int cont=0;cont<=(2-1);cont++){
