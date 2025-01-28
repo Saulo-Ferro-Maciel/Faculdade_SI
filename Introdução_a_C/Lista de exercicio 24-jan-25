@@ -1,0 +1,119 @@
+/*  IFMA - Monte Castelo
+    Curso: Sistemas de Informação - primeiro período
+    Aluno: Saulo Ferro Maciel
+    Atividade do dia 24 de janeiro de 2025 - Lista de Exercício   */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+#include <unistd.h>
+#include <math.h>
+
+void terminalClear(int clock) {
+    sleep(clock+1.5); // Apenas aguarda o tempo que o usuário deseja antes de limpar
+    printf("\033[H\033[J");  // Limpa o terminal
+}
+
+#include <stdio.h>
+
+void quartaQuestao() {
+    float num;
+
+    printf("Digite um número:\n");
+    scanf("%f", &num);
+
+    printf("Os números decimais serão converidos para inteiros\n%.2f virará %d\n",num,(int)num);
+    if (((int)num) % 2 == 0) {
+        if (num > 0) {
+            printf("O número é:\nPar\t\tPositivo");
+            printf("\n1\t\t1\t\tÉ par e positivo");
+        } else if (num < 0) {
+            printf("O número é:\nPar\t\tNegativo");
+            printf("\n1\t\t-1\t\tÉ par e negativo");
+        } else {
+            printf("O número é:\nPar\t\tNulo");
+            printf("\n1\t\t0\t\tÉ par e nulo.");
+        }
+    } else {
+        if (num > 0) {
+            printf("O número é:\nÍmpar\t\tPositivo");
+            printf("\n0\t\t1\t\tÉ ímpar e positivo");
+        } else if (num < 0) {
+            printf("O número é:\nÍmpar\t\tNegativo");
+            printf("\n0\t\t-1\t\tÉ ímpar e negativo");
+        }
+    }
+
+    terminalClear(6);
+}
+
+void terceiraQuestao() {
+    float notas[3], pesos[3] = {5, 3, 2}, media=0;
+    char escolha;
+
+    printf("\nCalculadora de notas Aritmética e Ponderada.\n");
+    printf("Você deseja ver a média aritmética ou ponderada?\n(Digite 'a' para aritmética ou 'p' para ponderada)\n");
+    printf("Resposta: ");
+    scanf(" %c", &escolha); 
+    for (int cont = 0; cont <= (3-1); cont++) {
+        printf("Adicione a %dª nota: ", cont + 1);
+        scanf("%f", &notas[cont]);
+    }
+    if (escolha == 'a' || escolha == 'A') { 
+        // Média aritmética
+        media = (notas[0] + notas[1] + notas[2]) / 3.0;
+        printf("A média aritmética das notas é: %.2f\n", media);
+    } else if (escolha == 'p' || escolha == 'P') {
+        // Média ponderada
+        float somaPesos = pesos[0] + pesos[1] + pesos[2];
+        media = ((notas[0] * pesos[0]) + (notas[1] * pesos[1]) + (notas[2] * pesos[2])) / somaPesos;
+        printf("A média ponderada das notas é: %.2f\n", media);
+    } else {
+        printf("Opção inválida! Digite 'a' para aritmética ou 'p' para ponderada.\n");
+    }
+
+    terminalClear(6);
+}
+
+void segundaQuestao(){
+    float bd[4], distancia=0;
+    printf("\nCalculador da distância entre dois pontos ( x1, y1) e (x2, y2).\n");
+    for (int cont = 0; cont <=(4-1); cont++) {
+        if (cont % 2 == 0) {
+            printf("Digite o valor de X%d:\n", (cont / 2) + 1);
+        } else {
+            printf("Digite o valor de Y%d:\n", (cont / 2) + 1);
+        }
+        scanf("%f", &bd[cont]);
+    }
+    distancia = sqrt(pow(bd[2] - bd[0], 2) + pow(bd[3] - bd[1], 2));
+    printf("A distância entre os pontos (%.2f, %.2f) e (%.2f, %.2f) é: %.2f\n",
+           bd[0], bd[1], bd[2], bd[3], distancia);
+           
+    terminalClear(6);
+}
+
+void primeiraQuestão() {
+    float bd[2];
+    printf("Analisador de número maior e menor:\n");
+    for(int cont=0;cont<=(2-1);cont++){
+        printf("Digite o %dº número:\n",cont+1);scanf("%f",&bd[cont]);
+    }
+    if(bd[0]>=bd[1]!=bd[0]==bd[1])printf("O maior número é %.2f e o menor seria o %.2f\n",bd[0],bd[1]);
+    if(bd[0]==bd[1]!=bd[0]>=bd[1])printf("O número %.2f e o %.2f são iguais",bd[1],bd[0]);
+    else {printf("O maior número é %.2f e o menor seria o %.2f\n",bd[1],bd[0]);
+    }
+    
+    terminalClear(6);
+}
+
+int main(){
+    setlocale(LC_ALL, "Portuguese");
+    
+    primeiraQuestao();
+    segundaQuestao();
+    terceiraQuestao();
+    quartaQuestao();
+    
+    return 0;
+}
