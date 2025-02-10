@@ -305,6 +305,7 @@ void clienteLogin() {
         } while (opcao != 5);
     } else {
         printf("Nome, CPF ou senha incorretos!\n");
+        terminalClear(1);
     }
 }
 
