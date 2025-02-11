@@ -44,9 +44,9 @@ void terminalClear(int clock) {
 void inicializarAdministradores() {
     FILE *file = fopen("administradores.txt", "w");
     if (file == NULL) {printf("Erro ao abrir o arquivo de administradores!\n"); return;}
-    fprintf(file, "1,Vitória Sofia,vitóriaIFMA2025\n");
-    fprintf(file, "2,Lucas Macário,macárioIFMA2025\n");
-    fprintf(file, "3,Mário Felipe,felipeIFMA2025\n");
+    fprintf(file, "1,Vitoria Sofia,vitoriaIFMA2025\n");
+    fprintf(file, "2,Lucas Macario,macarioIFMA2025\n");
+    fprintf(file, "3,Mario Felipe,felipeIFMA2025\n");
     fprintf(file, "4,Carlos Eduardo,eduardoIFMA2025\n");
     fprintf(file, "5,Saulo Ferro,ferroIFMA2025\n");
     fclose(file);
@@ -151,6 +151,7 @@ void transferir(Cliente *cliente) {
         printf("Operação não permitida. Sua conta está bloqueada.\n");
         return;
     }
+
     char cpfDestino[15];
     printf("Digite o CPF do destinatário: ");
     scanf("%14s", cpfDestino);
@@ -162,12 +163,18 @@ void transferir(Cliente *cliente) {
     }
 
     Cliente destinatario;
-    long posicao;
+    long posicaoLinha = 0;
     int encontrado = 0;
-    while (fscanf(file, "%d,%49[^,],%14[^,],%15[^,],%f\n", &destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, &destinatario.saldo) != EOF) {
+    char linha[256];  // Buffer para leitura de linhas completas
+
+    while (fgets(linha, sizeof(linha), file) != NULL) {
+        posicaoLinha = ftell(file) - strlen(linha);  // Calcula a posição no início da linha atual
+
+        sscanf(linha, "%d,%49[^,],%14[^,],%15[^,],%f", 
+               &destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, &destinatario.saldo);
+
         if (strcmp(destinatario.cpf, cpfDestino) == 0) {
             encontrado = 1;
-            posicao = ftell(file) - (long)sizeof(Cliente);
             break;
         }
     }
@@ -185,11 +192,15 @@ void transferir(Cliente *cliente) {
         float valor;
         printf("Digite o valor para transferir: R$ ");
         scanf("%f", &valor);
+
         if (valor > 0 && valor <= cliente->saldo) {
             cliente->saldo -= valor;
             destinatario.saldo += valor;
-            fseek(file, posicao, SEEK_SET);
+
+            // Atualiza o saldo do destinatário no arquivo
+            fseek(file, posicaoLinha, SEEK_SET);
             fprintf(file, "%d,%s,%s,%s,%.2f\n", destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, destinatario.saldo);
+            
             printf("Transferência realizada com sucesso!\n");
             registrarTransacao(cliente->id, "Transferência Enviada", valor);
             registrarTransacao(destinatario.id, "Transferência Recebida", valor);
@@ -197,6 +208,7 @@ void transferir(Cliente *cliente) {
             printf("Saldo insuficiente ou valor inválido!\n");
         }
     }
+
     fclose(file);
 }
 
@@ -293,7 +305,8 @@ void clienteLogin() {
                     transferir(&cliente);
                     break;
                 case 5:
-                    printf("Saindo...\n");
+                    printf("\nSaindo...\n");
+                    terminalClear(1);
                     break;
                 default:
                     printf("Opção inválida! Tente novamente.\n");
@@ -421,22 +434,43 @@ void verTodosClientes() {
     fclose(file2);
 }
 
-void criarContaCliente() {
+void criarContaCliente(int n) {
     terminalClear(1);
     Cliente novoCliente;
-
-    printf("Digite o ID do novo cliente: ");
-    scanf("%d", &novoCliente.id);
-    printf("Digite o nome do novo cliente: ");
-    scanf(" %49[^\n]", novoCliente.nome);
-    printf("Digite o CPF do novo cliente: ");
-    scanf(" %14s", novoCliente.cpf);
-    printf("Digite a senha do novo cliente (até 15 caracteres): ");
-    scanf(" %15s", novoCliente.senha);
     novoCliente.saldo = 0.0;
 
-    // Verificar se o cliente já existe pelo CPF
+    // Abrir o arquivo para verificar o último ID existente
     FILE *file = fopen("clientes.txt", "r");
+    int ultimoId = 0;
+
+    if (file != NULL) {
+        Cliente clienteExistente;
+        while (fscanf(file, "%d,%49[^,],%14[^,],%15[^,],%f\n", &clienteExistente.id, clienteExistente.nome, clienteExistente.cpf, clienteExistente.senha, &clienteExistente.saldo) == 5) {
+            ultimoId = clienteExistente.id;  // Atualiza o último ID encontrado
+        }
+        fclose(file);
+    }
+
+    // Atribuir o próximo ID automaticamente
+    novoCliente.id = ultimoId + 1;    
+    if(n==0){ // Se N for igual a 0, exibi o menu para os ADM
+        printf("Digite o nome do novo cliente: ");
+        scanf(" %49[^\n]", novoCliente.nome);
+        printf("Digite o CPF do novo cliente: ");
+        scanf(" %14s", novoCliente.cpf);
+        printf("Digite a senha do novo cliente (até 15 caracteres): ");
+        scanf(" %15s", novoCliente.senha);
+    } else{// Se N for diferente de 0, exibi o menu para cliente criar conta
+        printf("Olá, vamos criar sua conta\nDigite o seu nome: ");
+        scanf(" %49[^\n]", novoCliente.nome);
+        printf("Digite o CPF do novo cliente: ");
+        scanf(" %14s", novoCliente.cpf);
+        printf("Digite a senha do novo cliente (até 15 caracteres): ");
+        scanf(" %15s", novoCliente.senha);
+    }
+
+    // Verificar se o CPF já existe no arquivo
+    file = fopen("clientes.txt", "r");
     if (file != NULL) {
         Cliente clienteExistente;
         while (fscanf(file, "%d,%49[^,],%14[^,],%15[^,],%f\n", &clienteExistente.id, clienteExistente.nome, clienteExistente.cpf, clienteExistente.senha, &clienteExistente.saldo) == 5) {
@@ -452,7 +486,7 @@ void criarContaCliente() {
     // Adicionar o novo cliente ao arquivo
     file = fopen("clientes.txt", "a");
     if (file == NULL) {
-        printf("Erro ao abrir o arquivo de clientes!\n");
+        printf("Erro ao abrir o arquivo de clientes para escrita!\n");
         return;
     }
 
@@ -541,13 +575,13 @@ void adminLogin() {
                 desbloquearCliente();
             } else {
                 terminalClear(0);
-                criarContaCliente();
+                criarContaCliente(0);
             }
             break;
         case 4:
             if (admin.id == 3) {
                 terminalClear(0);
-                criarContaCliente();
+                criarContaCliente(0);
             } else {
                 terminalClear(0);
                 verTodosClientes();
@@ -599,7 +633,8 @@ int main() {
     do {
         printf("****** Bem-vindo ao Banco Digital ******\n");
         printf("1. Login como Cliente\n");
-        printf("2. Login como ADM\n");
+        printf("2. Criar Conta\n");
+        printf("3. Login como ADM\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
         switch (opcao) {
@@ -608,6 +643,9 @@ int main() {
                 clienteLogin();
                 break;
             case 2:
+                terminalClear(0);
+                criarContaCliente(1);
+            case 3:
                 terminalClear(0);
                 adminLogin();
                 break;
