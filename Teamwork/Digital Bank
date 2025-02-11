@@ -115,16 +115,68 @@ void sacar(Cliente *cliente) {
         printf("Operação não permitida. Sua conta está bloqueada.\n");
         return;
     }
+
     float valor;
     printf("Digite o valor para saque: R$ ");
     scanf("%f", &valor);
-    
-    if (valor > 0 && valor <= cliente->saldo) {
-        cliente->saldo -= valor;
-        printf("Saque realizado com sucesso! Novo saldo: R$ %.2f\n", cliente->saldo);
-        registrarTransacao(cliente->id, "Saque", valor);
+
+    if (valor <= 0) {
+        printf("Valor inválido!\n");
+        return;
+    }
+
+    if (valor > cliente->saldo) {
+        printf("Saldo insuficiente!\n");
+        return;
+    }
+
+    cliente->saldo -= valor;
+    printf("Saque realizado com sucesso! Novo saldo: R$ %.2f\n", cliente->saldo);
+    registrarTransacao(cliente->id, "Saque", valor);
+
+    // Atualiza o saldo no arquivo clientes.txt
+    FILE *file = fopen("clientes.txt", "r");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de clientes!\n");
+        return;
+    }
+
+    FILE *tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("Erro ao criar o arquivo temporário!\n");
+        fclose(file);
+        return;
+    }
+
+    Cliente tempCliente;
+    char linha[256];
+    int encontrado = 0;
+
+    // Lê e reescreve o arquivo, atualizando o cliente correspondente ao ID
+    while (fgets(linha, sizeof(linha), file) != NULL) {
+        sscanf(linha, "%d,%49[^,],%14[^,],%15[^,],%f", 
+               &tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, &tempCliente.saldo);
+
+        if (tempCliente.id == cliente->id) {
+            // Atualiza o saldo do cliente correspondente
+            tempCliente.saldo = cliente->saldo;
+            encontrado = 1;
+        }
+
+        // Escreve a linha (modificada ou não) no arquivo temporário
+        fprintf(tempFile, "%d,%s,%s,%s,%.2f\n", tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, tempCliente.saldo);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (encontrado) {
+        // Substitui o arquivo original pelo temporário
+        remove("clientes.txt");
+        rename("temp.txt", "clientes.txt");
     } else {
-        printf("Saldo insuficiente ou valor inválido!\n");
+        printf("Erro: Cliente não encontrado no arquivo!\n");
+        remove("temp.txt");
     }
 }
 
@@ -133,16 +185,63 @@ void depositar(Cliente *cliente) {
         printf("Operação não permitida. Sua conta está bloqueada.\n");
         return;
     }
+
     float valor;
     printf("Digite o valor para depósito: R$ ");
     scanf("%f", &valor);
-    
-    if (valor > 0) {
-        cliente->saldo += valor;
-        printf("Depósito realizado com sucesso! Novo saldo: R$ %.2f\n", cliente->saldo);
-        registrarTransacao(cliente->id, "Depósito", valor);
-    } else {
+
+    if (valor <= 0) {
         printf("Valor inválido!\n");
+        return;
+    }
+
+    cliente->saldo += valor;
+    printf("Depósito realizado com sucesso! Novo saldo: R$ %.2f\n", cliente->saldo);
+    registrarTransacao(cliente->id, "Depósito", valor);
+
+    // Atualiza o saldo no arquivo clientes.txt
+    FILE *file = fopen("clientes.txt", "r");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de clientes!\n");
+        return;
+    }
+
+    FILE *tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("Erro ao criar o arquivo temporário!\n");
+        fclose(file);
+        return;
+    }
+
+    Cliente tempCliente;
+    char linha[256];
+    int encontrado = 0;
+
+    // Lê e reescreve o arquivo, atualizando o cliente correspondente ao ID
+    while (fgets(linha, sizeof(linha), file) != NULL) {
+        sscanf(linha, "%d,%49[^,],%14[^,],%15[^,],%f", 
+               &tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, &tempCliente.saldo);
+
+        if (tempCliente.id == cliente->id) {
+            // Atualiza o saldo do cliente correspondente
+            tempCliente.saldo = cliente->saldo;
+            encontrado = 1;
+        }
+
+        // Escreve a linha (modificada ou não) no arquivo temporário
+        fprintf(tempFile, "%d,%s,%s,%s,%.2f\n", tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, tempCliente.saldo);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (encontrado) {
+        // Substitui o arquivo original pelo temporário
+        remove("clientes.txt");
+        rename("temp.txt", "clientes.txt");
+    } else {
+        printf("Erro: Cliente não encontrado no arquivo!\n");
+        remove("temp.txt");
     }
 }
 
@@ -156,60 +255,66 @@ void transferir(Cliente *cliente) {
     printf("Digite o CPF do destinatário: ");
     scanf("%14s", cpfDestino);
 
-    FILE *file = fopen("clientes.txt", "r+");
+    FILE *file = fopen("clientes.txt", "r");
     if (file == NULL) {
         printf("Erro ao acessar o banco de clientes!\n");
         return;
     }
 
+    FILE *tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(file);
+        return;
+    }
+
     Cliente destinatario;
-    long posicaoLinha = 0;
     int encontrado = 0;
-    char linha[256];  // Buffer para leitura de linhas completas
+    char linha[256];
 
     while (fgets(linha, sizeof(linha), file) != NULL) {
-        posicaoLinha = ftell(file) - strlen(linha);  // Calcula a posição no início da linha atual
-
         sscanf(linha, "%d,%49[^,],%14[^,],%15[^,],%f", 
                &destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, &destinatario.saldo);
 
         if (strcmp(destinatario.cpf, cpfDestino) == 0) {
             encontrado = 1;
-            break;
+            printf("Transferir para %s? (1 - Sim, 2 - Não): ", destinatario.nome);
+            int confirmar;
+            scanf("%d", &confirmar);
+
+            if (confirmar == 1) {
+                float valor;
+                printf("Digite o valor para transferir: R$ ");
+                scanf("%f", &valor);
+
+                if (valor > 0 && valor <= cliente->saldo) {
+                    cliente->saldo -= valor;
+                    destinatario.saldo += valor;
+
+                    printf("Transferência realizada com sucesso!\n");
+                    registrarTransacao(cliente->id, "Transferência Enviada", valor);
+                    registrarTransacao(destinatario.id, "Transferência Recebida", valor);
+                } else {
+                    printf("Saldo insuficiente ou valor inválido!\n");
+                }
+            }
         }
-    }
 
-    if (!encontrado) {
-        printf("Destinatário não encontrado!\n");
-        fclose(file);
-        return;
-    }
-
-    printf("Transferir para %s? (1 - Sim, 2 - Não): ", destinatario.nome);
-    int confirmar;
-    scanf("%d", &confirmar);
-    if (confirmar == 1) {
-        float valor;
-        printf("Digite o valor para transferir: R$ ");
-        scanf("%f", &valor);
-
-        if (valor > 0 && valor <= cliente->saldo) {
-            cliente->saldo -= valor;
-            destinatario.saldo += valor;
-
-            // Atualiza o saldo do destinatário no arquivo
-            fseek(file, posicaoLinha, SEEK_SET);
-            fprintf(file, "%d,%s,%s,%s,%.2f\n", destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, destinatario.saldo);
-            
-            printf("Transferência realizada com sucesso!\n");
-            registrarTransacao(cliente->id, "Transferência Enviada", valor);
-            registrarTransacao(destinatario.id, "Transferência Recebida", valor);
-        } else {
-            printf("Saldo insuficiente ou valor inválido!\n");
-        }
+        // Atualiza a linha (modificada ou não) no arquivo temporário
+        fprintf(tempFile, "%d,%s,%s,%s,%.2f\n", destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, destinatario.saldo);
     }
 
     fclose(file);
+    fclose(tempFile);
+
+    if (!encontrado) {
+        printf("Destinatário não encontrado!\n");
+        remove("temp.txt");
+    } else {
+        // Substituir o arquivo original pelo temporário
+        remove("clientes.txt");
+        rename("temp.txt", "clientes.txt");
+    }
 }
 
 void desbloquearCliente() {
