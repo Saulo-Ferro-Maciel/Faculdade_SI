@@ -251,57 +251,86 @@ void transferir(Cliente *cliente) {
 
     FILE *tempFile = fopen("temp.txt", "w");
     if (tempFile == NULL) {
-        printf("Erro ao criar arquivo temporário!\n");
+        printf("Erro ao criar o arquivo temporário!\n");
         fclose(file);
         return;
     }
 
+    Cliente tempCliente;
     Cliente destinatario;
-    int encontrado = 0;
+    int destinatarioEncontrado = 0;
+    int remetenteAtualizado = 0;
     char linha[256];
 
     while (fgets(linha, sizeof(linha), file) != NULL) {
         sscanf(linha, "%d,%49[^,],%14[^,],%15[^,],%f", 
-               &destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, &destinatario.saldo);
+               &tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, &tempCliente.saldo);
 
-        if (strcmp(destinatario.cpf, cpfDestino) == 0) {
-            encontrado = 1;
-            printf("Transferir para %s? (1 - Sim, 2 - Não): ", destinatario.nome);
-            int confirmar;
-            scanf("%d", &confirmar);
-
-            if (confirmar == 1) {
-                float valor;
-                printf("Digite o valor para transferir: R$ ");
-                scanf("%f", &valor);
-
-                if (valor > 0 && valor <= cliente->saldo) {
-                    cliente->saldo -= valor;
-                    destinatario.saldo += valor;
-
-                    printf("Transferência realizada com sucesso!\n");
-                    registrarTransacao(cliente->id, "Transferência Enviada", valor);
-                    registrarTransacao(destinatario.id, "Transferência Recebida", valor);
-                } else {
-                    printf("Saldo insuficiente ou valor inválido!\n");
-                }
-            }
+        if (tempCliente.id == cliente->id) {
+            tempCliente.saldo = cliente->saldo;  // Atualiza o saldo do remetente
+            remetenteAtualizado = 1;
         }
 
-        // Atualiza a linha (modificada ou não) no arquivo temporário
-        fprintf(tempFile, "%d,%s,%s,%s,%.2f\n", destinatario.id, destinatario.nome, destinatario.cpf, destinatario.senha, destinatario.saldo);
+        if (strcmp(tempCliente.cpf, cpfDestino) == 0) {
+            destinatario = tempCliente;
+            destinatarioEncontrado = 1;
+        }
+
+        fprintf(tempFile, "%d,%s,%s,%s,%.2f\n", tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, tempCliente.saldo);
     }
 
     fclose(file);
     fclose(tempFile);
 
-    if (!encontrado) {
+    if (!destinatarioEncontrado) {
         printf("Destinatário não encontrado!\n");
         remove("temp.txt");
+        return;
+    }
+
+    float valor;
+    printf("Transferir para %s? (1 - Sim, 2 - Não): ", destinatario.nome);
+    int confirmar;
+    scanf("%d", &confirmar);
+
+    if (confirmar != 1) {
+        printf("Operação cancelada.\n");
+        return;
+    }
+
+    printf("Digite o valor para transferir: R$ ");
+    scanf("%f", &valor);
+
+    if (valor > 0 && valor <= cliente->saldo) {
+        cliente->saldo -= valor;
+        destinatario.saldo += valor;
+
+        printf("Transferência realizada com sucesso! Novo saldo: R$ %.2f\n", cliente->saldo);
+        registrarTransacao(cliente->id, "Transferência Enviada", valor);
+        registrarTransacao(destinatario.id, "Transferência Recebida", valor);
+
+        // Atualiza o arquivo novamente para refletir os novos saldos
+        file = fopen("temp.txt", "r");
+        tempFile = fopen("clientes.txt", "w");
+
+        while (fgets(linha, sizeof(linha), file) != NULL) {
+            sscanf(linha, "%d,%49[^,],%14[^,],%15[^,],%f", 
+                   &tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, &tempCliente.saldo);
+
+            if (tempCliente.id == cliente->id) {
+                tempCliente.saldo = cliente->saldo;
+            } else if (tempCliente.id == destinatario.id) {
+                tempCliente.saldo = destinatario.saldo;
+            }
+
+            fprintf(tempFile, "%d,%s,%s,%s,%.2f\n", tempCliente.id, tempCliente.nome, tempCliente.cpf, tempCliente.senha, tempCliente.saldo);
+        }
+
+        fclose(file);
+        fclose(tempFile);
     } else {
-        // Substituir o arquivo original pelo temporário
-        remove("clientes.txt");
-        rename("temp.txt", "clientes.txt");
+        printf("Saldo insuficiente ou valor inválido!\n");
+        remove("temp.txt");
     }
 }
 
