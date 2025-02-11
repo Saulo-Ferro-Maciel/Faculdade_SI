@@ -32,7 +32,7 @@ typedef struct {
 
 // Limpa o terminal/prompt de comando
 void terminalClear(int clock) {
-    sleep(clock + 1.5);
+    sleep(clock + 0.7);
     #ifdef _WIN32
         system("cls");
     #else
@@ -43,10 +43,7 @@ void terminalClear(int clock) {
 // Cria o database com os administradores bases
 void inicializarAdministradores() {
     FILE *file = fopen("administradores.txt", "w");
-    if (file == NULL) {
-        printf("Erro ao abrir o arquivo de administradores!\n");
-        return;
-    }
+    if (file == NULL) {printf("Erro ao abrir o arquivo de administradores!\n"); return;}
     fprintf(file, "1,Vitória Sofia,vitóriaIFMA2025\n");
     fprintf(file, "2,Lucas Macário,macárioIFMA2025\n");
     fprintf(file, "3,Mário Felipe,felipeIFMA2025\n");
@@ -60,15 +57,11 @@ void inicializarClientes() {
     FILE *file = fopen("clientes.txt", "r");
     if (file == NULL) {
         file = fopen("clientes.txt", "w");
-        if (file == NULL) {
-            printf("Erro ao criar o arquivo de clientes!\n");
-            return;
-        }
-        printf("Arquivo de clientes criado com sucesso.\n");
+        if (file == NULL) {printf("Erro ao criar o arquivo de clientes!\n");return;}
+        fprintf(file, "1,Eddynara Costa,90496494082,12345678910,0,00\n");
+        fprintf(file, "2,Emanuel Costa,45345244049,111222333,0,00\n");
         fclose(file);
-    } else {
-        fclose(file);
-    }
+    } else {fclose(file);}
     file = fopen("bloqueados.txt", "w");
     if (file != NULL) fclose(file); // Cria o arquivo de bloqueados se não existir
 }
@@ -86,6 +79,25 @@ int verificarBloqueio(int idCliente) {
     }
     fclose(file);
     return 0;
+}
+
+// Idealiza o bloqueio da conta do cliente
+void bloquearCliente(int n) {
+    int idCliente;
+    if (n==0){
+        printf("Digite o ID do cliente a ser bloqueado: ");
+        scanf("%d", &idCliente);
+        FILE *file = fopen("bloqueados.txt", "a");
+        if (file == NULL) {printf("Erro ao acessar o arquivo de bloqueados!\n"); return;}
+        fprintf(file, "%d\n", idCliente);
+        fclose(file);
+        printf("Cliente com ID %d bloqueado com sucesso!\n", idCliente);
+    } else {
+        FILE *file = fopen("bloqueados.txt", "a");
+        if (file == NULL) {printf("Erro ao acessar o arquivo de bloqueados!\n"); return;}
+        fprintf(file, "%d\n", n);
+        fclose(file);
+    }
 }
 
 void registrarTransacao(int idCliente, const char *tipo, float valor) {
@@ -186,21 +198,6 @@ void transferir(Cliente *cliente) {
         }
     }
     fclose(file);
-}
-
-// Idealiza o bloqueio da conta do cliente
-void bloquearCliente() {
-    int idCliente;
-    printf("Digite o ID do cliente a ser bloqueado: ");
-    scanf("%d", &idCliente);
-    FILE *file = fopen("bloqueados.txt", "a");
-    if (file == NULL) {
-        printf("Erro ao acessar o arquivo de bloqueados!\n");
-        return;
-    }
-    fprintf(file, "%d\n", idCliente);
-    fclose(file);
-    printf("Cliente com ID %d bloqueado com sucesso!\n", idCliente);
 }
 
 void desbloquearCliente() {
@@ -369,6 +366,7 @@ void removerAdministrador() {
 }
 
 void verTodosClientes() {
+    // Abre o arquivo de clientes para leitura
     FILE *file = fopen("clientes.txt", "r");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo de clientes!\n");
@@ -376,16 +374,51 @@ void verTodosClientes() {
     }
 
     Cliente cliente;
+    // Exibe o cabeçalho da lista de todos os clientes
     printf("\nLista de Clientes:\n");
     printf("ID\tNome\t\t\tCPF\t\t\tSenha\n");
     printf("-------------------------------------------------------------\n");
 
+    // Lê os dados de cada cliente no arquivo "clientes.txt"
     while (fscanf(file, "%d,%49[^,],%14[^,],%15[^,],%f\n", &cliente.id, cliente.nome, cliente.cpf, cliente.senha, &cliente.saldo) == 5) {
+        // Remove possíveis quebras de linha no nome
         cliente.nome[strcspn(cliente.nome, "\r\n")] = '\0';
+        
+        // Exibe os dados do cliente
         printf("%d\t%s\t\t%s\t%s\n", cliente.id, cliente.nome, cliente.cpf, cliente.senha);
     }
+    // Reinicia a leitura do arquivo de clientes
+    rewind(file);
 
+    // Abre o arquivo de contas bloqueadas para leitura
+    FILE *file2 = fopen("bloqueados.txt", "r");
+    if (file2 == NULL) {
+        printf("Erro ao abrir o arquivo de clientes com bloqueio!\n");
+        fclose(file);
+        return;
+    }
+
+    // Exibe o cabeçalho da lista de contas bloqueadas
+    printf("\nLista de Contas Bloqueadas:\n");
+    printf("ID\tNome\t\t\tCPF\n");
+    printf("-------------------------------------------------------------\n");
+
+    int id_bloqueado;
+    // Lê cada ID do arquivo "bloqueados.txt"
+    while (fscanf(file2, "%d\n", &id_bloqueado) == 1) {
+        rewind(file); // Reinicia a leitura do arquivo "clientes.txt" para procurar o cliente correspondente ao ID bloqueado
+        // Procura o cliente com o ID correspondente
+        while (fscanf(file, "%d,%49[^,],%14[^,],%15[^,],%f\n", &cliente.id, cliente.nome, cliente.cpf, cliente.senha, &cliente.saldo) == 5) {
+            if (cliente.id == id_bloqueado) {
+                // Exibe o cliente como bloqueado se o ID for encontrado
+                printf("%d\t%s\t\t%s\n", cliente.id, cliente.nome, cliente.cpf);
+                break; 
+            }
+        }
+    }
+    // Fecha os arquivos
     fclose(file);
+    fclose(file2);
 }
 
 void criarContaCliente() {
@@ -490,13 +523,13 @@ void adminLogin() {
                 criarNovoAdministrador();
             } else {
                 terminalClear(0);
-                bloquearCliente();
+                bloquearCliente(0);
             }
             break;
         case 2:
             if (admin.id == 3) {
                 terminalClear(0);
-                bloquearCliente();
+                bloquearCliente(0);
             } else {
                 terminalClear(0);
                 desbloquearCliente();
@@ -561,6 +594,7 @@ int main() {
     setlocale(LC_ALL, "Portuguese");
     inicializarAdministradores();
     inicializarClientes();
+    bloquearCliente(1);
     int opcao;
     do {
         printf("****** Bem-vindo ao Banco Digital ******\n");
