@@ -745,7 +745,8 @@ int main() {
         printf("****** Bem-vindo ao Banco Digital ******\n");
         printf("1. Login como Cliente\n");
         printf("2. Criar Conta\n");
-        printf("3. Sair\n");
+        printf("3. Login como ADM\n");
+        printf("4. Sair\n");
         printf("Escolha uma opção: ");
 
         if (scanf("%d", &opcao) != 1) {
@@ -765,13 +766,16 @@ int main() {
                 criarContaCliente(1);
                 break;
             case 3:
+                terminalClear(0);
+                adminLogin();
+                break;
+            case 4:
                 printf("Saindo...\n");
                 break;
             default:
                 printf("Opção inválida! Tente novamente.\n");
         }
-    } while (opcao != 3);
+    } while (opcao != 4);
 
     return 0;
 }
-
