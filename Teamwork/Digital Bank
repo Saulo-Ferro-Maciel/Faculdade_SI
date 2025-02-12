@@ -90,33 +90,20 @@ void bloquearCliente(int n) {
 
 void registrarTransacao(int idCliente, const char *tipo, float valor) {
     FILE *file = fopen("transacoes.txt", "a");
-    if (file == NULL) {
-        printf("Erro ao registrar a transação!\n");
-        return;
-    }
+    if (file == NULL) {printf("Erro ao registrar a transação!\n");return;}
     fprintf(file, "%d,%s,%.2f\n", idCliente, tipo, valor);
     fclose(file);
 }
 
 void sacar(Cliente *cliente) {
-    if (verificarBloqueio(cliente->id)) {
-        printf("Operação não permitida. Sua conta está bloqueada.\n");
-        return;
-    }
+    if (verificarBloqueio(cliente->id)) { printf("Operação inválida. Sua conta está bloqueada.\n"); return;}
 
     float valor;
     printf("Digite o valor para saque: R$ ");
     scanf("%f", &valor);
 
-    if (valor <= 0) {
-        printf("Valor inválido!\n");
-        return;
-    }
-
-    if (valor > cliente->saldo) {
-        printf("Saldo insuficiente!\n");
-        return;
-    }
+    if (valor <= 0) { printf("Valor inválido!\n"); return;}
+    if (valor > cliente->saldo) { printf("Saldo insuficiente!\n"); return;}
 
     cliente->saldo -= valor;
     printf("Saque realizado com sucesso! Novo saldo: R$ %.2f\n", cliente->saldo);
@@ -762,7 +749,8 @@ int main() {
         printf("Escolha uma opção: ");
 
         if (scanf("%d", &opcao) != 1) {
-            printf("Entrada inválida! Digite um número.\n");
+            terminalClear(0);
+            printf("\nEntrada inválida! Digite um número.\n");
             while (getchar() != '\n');
             continue;
         }
@@ -786,3 +774,4 @@ int main() {
 
     return 0;
 }
+
