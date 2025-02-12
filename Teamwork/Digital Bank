@@ -1,8 +1,8 @@
-#include <stdio.h>   // Biblioteca para entrada e saída padrão
-#include <stdlib.h>  // Biblioteca para alocação de memória, controle de processos, conversões, etc.
-#include <locale.h>  // Biblioteca para configuração de localização
-#include <unistd.h>  // Biblioteca para funções de pausa e manipulação de processos
-#include <string.h>  // Biblioteca responsável pelo gerenciamento de strings
+#include <stdio.h>   
+#include <stdlib.h> 
+#include <locale.h>  
+#include <unistd.h>  
+#include <string.h>  
 
 typedef struct {
     int id;
