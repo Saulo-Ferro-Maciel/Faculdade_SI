@@ -1,0 +1,38 @@
+% Fatos de exemplo para as notas
+test_score1(4.0, 'Mário').
+test_score1(5.0, 'Maycon').
+test_score1(7.0, 'Pedro').
+
+test_score2(5.0, 'Mário').
+test_score2(6.0, 'Maycon').
+test_score2(8.0, 'Pedro').
+
+test_score3(4.0, 'Mário').
+test_score3(5.5, 'Maycon').
+test_score3(6.0, 'Pedro').
+
+% Arredondamento para 2 casas decimais
+round_to_two(Num, Arredonda) :-
+    Arredonda is round(Num * 100) / 100.
+
+% Cálculo da média arredondada
+media_score(Student, MediaArredonda) :-
+    test_score1(N1, Student),
+    test_score2(N2, Student),
+    test_score3(N3, Student),
+    Media is (N1 + N2 + N3) / 3,
+    round_to_two(Media, MediaArredonda).
+
+% Regra ajustada para incluir o nome do estudante no status
+approved_during_the_period(Student, ScoreStatus, N1, N2, N3) :-
+    media_score(Student, Media),
+    test_score1(N1, Student),
+    test_score2(N2, Student),
+    test_score3(N3, Student),
+    (   Media < 5 ->
+        format(atom(ScoreStatus), 'Aluno ~a está reprovado pois a média é ~2f (notas: ~2f, ~2f, ~2f)', [Student, Media, N1, N2, N3])
+    ;   Media >= 5, Media =< 6 ->
+        format(atom(ScoreStatus), 'Aluno ~a deve fazer recuperação pois a média é ~2f (notas: ~2f, ~2f, ~2f)', [Student, Media, N1, N2, N3])
+    ;   Media > 6 ->
+        format(atom(ScoreStatus), 'Aluno ~a está aprovado com a média ~2f (notas: ~2f, ~2f, ~2f)', [Student, Media, N1, N2, N3])
+    ).
