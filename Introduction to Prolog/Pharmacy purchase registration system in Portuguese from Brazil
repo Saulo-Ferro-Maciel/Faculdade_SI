@@ -85,3 +85,34 @@ exibirProdutosNota(CodigoNota) :-
          format(' ~w    ||  ', [Preco]),
          format('~w~n', [Subtotal]))
     ).
+% Regra principal para exibir clientes e seus tratamentos
+exibirClientesTratamentos :-
+    format(' ***************************************************************************~n', []),
+    format(' *            Clientes e Tratamentos em Andamento                          *~n', []),
+    format(' ***************************************************************************~n', []),
+    forall(
+        cliente(CodigoCliente, NomeCliente, DataNascimento),
+        (findall(
+            DescricaoTratamento,
+            (nota(CodigoNota, CodigoCliente, _, _),
+             detalhesNota(CodigoNota, CodigoProduto, _, _),
+             produto(CodigoProduto, _, CodigoTratamento),
+             tratamento(CodigoTratamento, DescricaoTratamento)),
+            ListaTratamentos),
+         sort(ListaTratamentos, TratamentosUnicos), % Remove duplicatas
+         (TratamentosUnicos \= [] ->
+             format('~nCliente: ~w (Código: ~w) - Nascimento: ~w~n', [NomeCliente, CodigoCliente, DataNascimento]),
+             format('Tratamentos: '),
+             exibirListaTratamentos(TratamentosUnicos),
+             format('~n--------------------------------------------------~n', [])
+          ; true)) % Ignora clientes sem tratamentos
+    ),
+    format(' ***************************************************************************~n', []).
+
+% Regra auxiliar para exibir a lista de tratamentos
+exibirListaTratamentos([]).
+exibirListaTratamentos([Tratamento]) :-
+    format('~w', [Tratamento]).
+exibirListaTratamentos([Tratamento | Resto]) :-
+    format('~w, ', [Tratamento]),
+    exibirListaTratamentos(Resto).
