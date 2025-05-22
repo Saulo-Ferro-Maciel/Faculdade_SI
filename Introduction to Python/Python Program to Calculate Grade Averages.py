@@ -17,7 +17,7 @@ while controle != 0:
             else:
                 notaString += f"{listaNotas[i]}."
         media = nota/auxiliar        
-        print(f"\nFora adicionadas {auxiliar} notas.\nAs notas adicionas fora {notaString}\nA média das notas é: {media}")
+        print(f"\nForam adicionadas {auxiliar} notas.\nAs notas adicionas fora {notaString}\nA média das notas é: {media}")
     except:
         print("Por favor valores digite válidos")
     
