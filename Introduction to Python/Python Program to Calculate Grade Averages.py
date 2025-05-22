@@ -21,6 +21,6 @@ while controle != 0:
     except:
         print("Por favor valores digite válidos")
     
-    pregunta = input("Deseja sair? [sim/não] ")
+    pergunta = input("Deseja sair? [sim/não] ")
     if pregunta[0].lower() == "s":
         controle = 0
